@@ -27,6 +27,7 @@ const App = () =>{
 
       if(validateResponse.status== 200){
         const userEmail = await validateResponse.text();
+        await AsyncStorage.setItem('userName',UserEmail);
         console.log('userEmail', userEmail);
         setIsLoggedIn(true);
       }
@@ -56,7 +57,7 @@ return(
           onPress={async()=>{
             console.log('Button was pressed')
 
-            await fetch(
+            const sendTextResponse = await fetch(
               "https://dev.stedi.me/twofactorlogin/"+phoneNumber,
               {
                 method: "POST",
@@ -65,6 +66,10 @@ return(
                 },
               }
             )
+            if (sendTextResponse.status!=200){
+              console.log('Server send text response: '+sendTextResponse.status);
+              Alert.alert('Communication Error','Server responded to send text with status: '+sentTextResponse.status);
+            }
           }}
         />  
         <TextInput
@@ -96,9 +101,9 @@ return(
             )
             console.log("status",loginResponse.status)
 
-            if(loginResponse.status == 200){
+            if(loginResponse.status == 200){//200 means the password was valid
               const sessionToken = await loginResponse.text();
-              await AsyncStorage.setItem('sessionToken', sessionToken)
+              await AsyncStorage.setItem('sessionToken', sessionToken);
               console.log('Session Token', sessionToken);
 
               
